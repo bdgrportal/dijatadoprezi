@@ -14,6 +14,7 @@
   --body:"Figtree",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
   --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Menlo,monospace;
   color-scheme:light;
+  --fig-floor:#F1DDBF;
   --sky1:#F6EEDF; --sky2:#F1D3A4; --sky3:#E3955A; --sun:#FFF1CF; --silh:#22201F; --water1:#8E5A3C; --water2:#2B2522;
   --hero-ink:#1F1B18; --hero-muted:#5E4D3E; --hero-accent:#9A4E14; --hero-line:rgba(31,27,24,.16);
 }
@@ -23,12 +24,12 @@
     --accent:#E3A04C; --accent-soft:#3A2C18; --moss:#9CC0A6; --moss-soft:#223229; --wine:#E08A80; --wine-soft:#3A2220;
     --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark;
     --sky1:#141A24; --sky2:#2A2735; --sky3:#6A3B2C; --sun:#F2C98A; --silh:#07090A; --water1:#3A2620; --water2:#07090A;
-    --hero-ink:#F2ECE2; --hero-muted:#C9B8A6; --hero-accent:#F0AE5C; --hero-line:rgba(242,236,226,.16);
+    --hero-ink:#F2ECE2; --hero-muted:#C9B8A6; --hero-accent:#F0AE5C; --hero-line:rgba(242,236,226,.16); --fig-floor:#C9B79C;
   }
 }
 :root[data-theme="dark"]{
   --sky1:#141A24; --sky2:#2A2735; --sky3:#6A3B2C; --sun:#F2C98A; --silh:#07090A; --water1:#3A2620; --water2:#07090A;
-  --hero-ink:#F2ECE2; --hero-muted:#C9B8A6; --hero-accent:#F0AE5C; --hero-line:rgba(242,236,226,.16);
+  --hero-ink:#F2ECE2; --hero-muted:#C9B8A6; --hero-accent:#F0AE5C; --hero-line:rgba(242,236,226,.16); --fig-floor:#C9B79C;
   --bg:#121815; --surface:#1A221E; --surface-2:#222C27; --ink:#ECE8DF; --muted:#A1AAA2; --line:#2F3A34;
   --accent:#E3A04C; --accent-soft:#3A2C18; --moss:#9CC0A6; --moss-soft:#223229; --wine:#E08A80; --wine-soft:#3A2220;
   --shadow:0 1px 2px rgba(0,0,0,.3),0 10px 30px -14px rgba(0,0,0,.6); color-scheme:dark;
@@ -163,24 +164,50 @@ section{padding-block:clamp(48px,7vw,88px) 0}
 :root[data-theme="dark"] .ev.award{background:#5E2422;border-color:#5E2422}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ev.award{background:#5E2422;border-color:#5E2422}}
 
+/* catch the wave */
+.ctw{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
+.ctw-main{background:var(--moss);color:#F3F1EA;border-radius:20px;padding:clamp(24px,4vw,40px);position:relative;overflow:hidden}
+:root[data-theme="dark"] .ctw-main{background:#223A2C}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ctw-main{background:#223A2C}}
+.ctw-main .eyebrow{color:#CFE0D3}
+.ctw-main h2{font-size:clamp(2.2rem,5vw,3.6rem);font-weight:800;line-height:1;margin-top:10px}
+.ctw-tag{font-family:var(--display);font-style:italic;color:#F1C98E;margin-top:8px}
+.ctw-lead{margin-top:18px;max-width:58ch;font-size:1.05rem;color:#E8EDE6}
+.ctw-points{list-style:none;margin:24px 0 0;padding:0;display:grid;gap:14px}
+.ctw-points li{display:grid;gap:2px;padding-left:16px;border-left:2px solid #F1C98E}
+.ctw-points b{font-weight:700}
+.ctw-points span{color:#D6E0D8;font-size:.95rem}
+.ctw-cast{margin-top:24px;font-size:.85rem;color:#C6D4C9;line-height:1.6}
+.ctw-cast span{font-weight:700;letter-spacing:.08em;text-transform:uppercase;font-size:.72rem;color:#F1C98E;margin-right:4px}
+.ctw-quotes{display:flex;flex-direction:column;gap:12px}
+.ctw-quotes blockquote{margin:0;background:var(--surface);border:1px solid var(--line);border-radius:18px;padding:20px 22px}
+.ctw-quotes blockquote p{font-family:var(--display);font-size:1.05rem;line-height:1.4;font-weight:400}
+.ctw-quotes cite{display:block;margin-top:10px;font-style:normal;font-size:.85rem;color:var(--muted);font-weight:600}
+a.wavelink{color:inherit;text-decoration:none}
+a.wavelink:hover .nm{text-decoration:underline}
+@media (max-width:980px){.ctw{grid-template-columns:1fr}}
+
 /* dress code */
 .dress{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .dcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;grid-template-columns:clamp(90px,11vw,130px) 1fr;gap:22px;align-items:start}
-.fig{width:100%;height:auto;background:linear-gradient(180deg,transparent 55%,var(--accent-soft) 55%,var(--accent-soft) 100%);border-radius:16px;padding:10px 6px 4px}
-.fig .f-ink{fill:var(--ink)}
+.fig{width:100%;height:auto;background:linear-gradient(180deg,transparent 55%,var(--fig-floor) 55%,var(--fig-floor) 100%);border-radius:16px;padding:10px 6px 4px}
+.fig .f-ink{fill:#1F2833}
 .fig .f-skin{fill:#C9A58A}
-.fig .f-light{fill:var(--bg)}
-.fig .f-lapel{fill:var(--ink);stroke:var(--surface);stroke-width:1.2;stroke-linejoin:round}
-.fig .f-pant{fill:var(--moss)}
-.fig .f-skirt{fill:var(--wine)}
+.fig .f-light{fill:#F4F2EC}
+.fig .f-lapel{fill:none;stroke:#F4F2EC;stroke-width:1.1;stroke-linejoin:round;opacity:.7}
+.fig .f-pant{fill:var(--ink)}
+.fig .f-skirt{fill:var(--ink)}
 .fig .f-acc{fill:var(--accent)}
+.fig .f-tie{fill:#7B2C2A}
+.fig .f-hair{fill:#3A2A20}
+.fig .f-line{fill:none;stroke:#F4F2EC;stroke-width:.8;opacity:.35}
 .dtext h3{font-size:1.35rem;font-weight:700;margin-bottom:12px}
 .dlab{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin:12px 0 6px}
 .dlab.ok{color:var(--moss)}
 .dlab.no{color:var(--wine)}
 .dtext ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.93rem}
 .dtext li{display:flex;gap:8px}
-.dtext li::before{content:"+";flex:none;width:18px;height:18px;margin-top:2px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;background:var(--moss-soft);color:var(--moss)}
+.dtext li::before{content:"✓";flex:none;width:18px;height:18px;margin-top:2px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;background:var(--moss-soft);color:var(--moss)}
 .dtext ul.no li::before{content:"×";background:var(--wine-soft);color:var(--wine)}
 @media (max-width:860px){.dress{grid-template-columns:1fr}}
 @media (max-width:420px){.dcard{grid-template-columns:1fr}.fig{width:120px}}
@@ -389,75 +416,87 @@ body.locked .page{visibility:hidden}
     <div class="plist" id="plist"></div>
   </section>
 
+  <section id="ctw">
+    <div class="ctw">
+      <div class="ctw-main">
+        <div class="eyebrow">Tréningpartner · szombat</div>
+        <h2>Catch the Wave</h2>
+        <p class="ctw-tag">„all the love all the power”</p>
+        <p class="ctw-lead">Improvizációs értékesítési tréning, ahol színművészek játsszák az ügyfelet. A résztvevők életszerű helyzetekben gyakorolják az ügyféltárgyalást, a telefonálást és a kifogáskezelést, és kívülről is látják a saját értékesítési folyamatukat.</p>
+        <ul class="ctw-points">
+          <li><b>Élő szituációk színészekkel</b><span>Különböző ügyféltípusok, a hétköznapi helyzetektől az extrém esetekig.</span></li>
+          <li><b>Stop, vissza, elemzés</b><span>A jelenet bármikor megállítható és újrajátszható: kockázatmentes terep új megoldások kipróbálására.</span></li>
+          <li><b>Kezdőtől a rutinosig</b><span>A telefonálás és az ügyféltárgyalás gátjainak lebontásától a tapasztalt tanácsadók technikáinak csiszolásáig.</span></li>
+        </ul>
+        <p class="ctw-cast"><span>Színművészek:</span> Bodolai Balázs, Bokor Barna, Durugy Tamás, Drunek Sára, Fodor Piroska, Gecse Ramóna, Horváth Lilla Holly, Korpos András, Rimóczi Dóra, Rózsa László, Szigeti Péter, Szentendrei Anna, Váradi Gergő</p>
+      </div>
+      <div class="ctw-quotes">
+        <div class="eyebrow">Rólunk mondták</div>
+        <blockquote><p>„Különösen hasznos volt, hogy bármikor megállíthattuk a szituációt, visszaléphettünk és elemezhettük, mit lehetett volna jobban csinálni.”</p><cite>Horváth Tamás, Területi Igazgató</cite></blockquote>
+        <blockquote><p>„Csak ajánlani tudom mindenkinek, 100-szorosan megtérül hosszú távon a befektetett idő, pénz és energia.”</p><cite>Bódi Mónika, Fiókvezető</cite></blockquote>
+        <blockquote><p>„Az elmúlt 10 évben százával voltam hasonló fejlesztő, edukatív alkalmakon, viszont az elmúlt évekből ez tetszett a legjobban!”</p><cite>Szitás Gergő, Területi Vezető</cite></blockquote>
+      </div>
+    </div>
+  </section>
+
   <section id="este">
     <div class="sec-head"><div><div class="eyebrow">Szombat este</div><h2>Az esti program</h2></div></div>
     <div class="evening" id="evening"></div>
   </section>
 
   <section id="dresscode">
-    <div class="sec-head"><div><div class="eyebrow">Dress code</div><h2>Business Casual</h2><p>Elegáns, de nem öltönyös-kosztümös megjelenés: rendezett, letisztult darabok, amelyekben egész nap kényelmesen érzed magad és jól képviseled a csapatot.</p></div></div>
+    <div class="sec-head"><div><div class="eyebrow">Dress code</div><h2>Business</h2><p>Kizárólag formális, üzleti öltözet.</p></div></div>
     <div class="dress">
       <div class="dcard">
-        <svg class="fig" viewBox="0 0 120 300" role="img" aria-label="Férfi business casual sziluett: blézer, galléros ing, chino nadrág, bőrcipő">
-  <path class="f-ink" d="M44 30a16 17 0 0 1 32 0c0 4-1 7-2 9l-1-9c-6-4-20-4-26 0l-1 9c-1-2-2-5-2-9Z"/>
-  <ellipse class="f-skin" cx="60" cy="32" rx="14" ry="16"/>
-  <path class="f-skin" d="M54 44h12v12H54Z"/>
-  <path class="f-pant" d="M35 146h50l-2 124H67l-7-104-7 104H37Z"/>
-  <path class="f-ink" d="M36 270h19v8H30c0-5 2-8 6-8Z M65 270h19c4 0 6 3 6 8H65Z"/>
-  <path class="f-light" d="M46 56h28l-4 70H50Z"/>
-  <path class="f-ink" d="M34 58q26-10 52 0l10 14 2 80H22l2-80Z"/>
-  <path class="f-light" d="M50 55l10 44 10-44-10 8Z"/>
-  <path class="f-lapel" d="M50 55l-6 18 10 4-4 6 10 16Z M70 55l6 18-10 4 4 6-10 16Z"/>
-  <path class="f-ink" d="M25 70l-9 72h9l10-64Z M95 70l9 72h-9l-10-64Z"/>
-  <circle class="f-skin" cx="20" cy="147" r="5"/><circle class="f-skin" cx="100" cy="147" r="5"/>
-  <path class="f-acc" d="M72 70h8v3h-8Z"/>
+        <svg class="fig" viewBox="0 0 120 290" role="img" aria-label="Férfi sziluett: öltöny, ing, nyakkendő, bőrcipő">
+  <path class="f-ink" d="M40 136H80L78 270H63.5L60 158L56.5 270H42Z"/>
+  <path class="f-line" d="M50 150V266M70 150V266"/>
+  <path class="f-ink" d="M42 270H57V277H35C35 273 38 270 42 270Z M63 270H78C82 270 85 273 85 277H63Z"/>
+  <path class="f-light" d="M49 44H71L66 96H54Z"/>
+  <path class="f-tie" d="M58.2 47H61.8L63 51.5L61.4 84L60 88L58.6 84L57 51.5Z"/>
+  <path class="f-ink" d="M41 47L51.5 44.5L60 92L68.5 44.5L79 47L87 55L89 138L31 138L33 55Z"/>
+  <path class="f-lapel" d="M51.5 44.5L46.5 61L53 64.5L50.5 68L60 92 M68.5 44.5L73.5 61L67 64.5L69.5 68L60 92"/>
+  <path class="f-ink" d="M33 55L26.5 131H33.5L41 68Z M87 55L93.5 131H86.5L79 68Z"/>
+  <circle class="f-skin" cx="30" cy="135" r="4"/><circle class="f-skin" cx="90" cy="135" r="4"/>
+  <path class="f-acc" d="M71 72H79V75H71Z"/>
+  <path class="f-skin" d="M56 34H64V46H56Z"/>
+  <ellipse class="f-skin" cx="60" cy="26" rx="10.5" ry="12.5"/>
+  <path class="f-hair" d="M49.2 24C48.5 14 53 10 60 10C67 10 71.5 14 70.8 24C69.5 19 67 17.5 60 17.5C53 17.5 50.5 19 49.2 24Z"/>
 </svg>
         <div class="dtext">
           <h3>Férfiaknak</h3>
-          <div class="dlab ok">Ajánlott</div>
           <ul>
-            <li>Galléros ing vagy galléros póló, ing esetén nyakkendő nélkül is rendben</li>
-            <li>Blézer vagy zakó, nem kötelező, de emeli a megjelenést</li>
-            <li>Chino vagy szövetnadrág, sötét, ép farmer is elfogadható</li>
-            <li>Bőrcipő, loafer vagy letisztult bőr sneaker</li>
-          </ul>
-          <div class="dlab no">Kerüld</div>
-          <ul class="no">
-            <li>Rövidnadrág, melegítő, sportmez</li>
-            <li>Szakadt farmer, feliratos póló</li>
-            <li>Papucs, futócipő</li>
+            <li>Öltöny</li>
+            <li>Ing</li>
+            <li>Elegáns bőrcipő</li>
           </ul>
         </div>
       </div>
       <div class="dcard">
-        <svg class="fig" viewBox="0 0 120 300" role="img" aria-label="Női business casual sziluett: blézer, blúz, midi szoknya, alacsony sarkú cipő">
-  <path class="f-ink" d="M42 34c0-14 8-22 18-22s18 8 18 22v26c-4 2-8 2-10 0V36H52v24c-2 2-6 2-10 0Z"/>
-  <ellipse class="f-skin" cx="60" cy="32" rx="12.5" ry="15"/>
-  <path class="f-skin" d="M55 44h10v12H55Z"/>
-  <path class="f-skin" d="M47 214h9l-1 56h-7Z M64 214h9l-1 56h-7Z"/>
-  <path class="f-ink" d="M46 268h9l1 8H40c0-4 2-7 6-8Z M65 268h9c4 1 6 4 6 8H64Z"/>
-  <path class="f-skirt" d="M39 124h42l12 96H27Z"/>
-  <path class="f-light" d="M46 56h28l-2 70H48Z"/>
-  <path class="f-ink" d="M38 58q22-9 44 0l8 12 2 58-12 2-4-58H44l-4 58-12-2 2-58Z"/>
-  <path class="f-light" d="M52 55l8 26 8-26Z"/>
-  <path class="f-ink" d="M29 70l-8 64h8l9-58Z M91 70l8 64h-8l-9-58Z"/>
-  <circle class="f-skin" cx="25" cy="139" r="4.5"/><circle class="f-skin" cx="95" cy="139" r="4.5"/>
-  <path class="f-acc" d="M58 86h4v4h-4Z"/>
+        <svg class="fig" viewBox="0 0 120 290" role="img" aria-label="Női sziluett: szabott blézer, blúz, ceruzaszoknya, magassarkú">
+  <path class="f-skin" d="M47.5 194H55L54 262H49.5Z M65 194H72.5L70.5 262H66Z"/>
+  <path class="f-ink" d="M49 261H55L56.5 270H43.5C44 265 46 262 49 261Z M54.5 270V276H53V270Z M65.5 261H71.5C74.5 262 76.5 265 76.5 270H63.5Z M65.5 270V276H67V270Z"/>
+  <path class="f-ink" d="M42.5 126H77.5L75 196H45Z"/>
+  <path class="f-line" d="M60 170V196"/>
+  <path class="f-light" d="M50 46H70L67 92H53Z"/>
+  <path class="f-ink" d="M44 49L52 46L60 80L68 46L76 49L82 57L80.5 90Q78.5 104 82 128L38 128Q41.5 104 39.5 90L38 57Z"/>
+  <path class="f-lapel" d="M52 46L48 60L53.5 63L60 80 M68 46L72 60L66.5 63L60 80"/>
+  <path class="f-ink" d="M38 57L32 124H37.5L44 70Z M82 57L88 124H82.5L76 70Z"/>
+  <circle class="f-skin" cx="34.5" cy="128" r="3.6"/><circle class="f-skin" cx="85.5" cy="128" r="3.6"/>
+  <path class="f-hair" d="M47 31C46 16 52 10 60 10C68 10 74 16 73 31L74.5 42C71 44 68 43 66.5 41L67 27C64 23 56 23 53 27L53.5 41C52 43 49 44 45.5 42Z"/>
+  <path class="f-skin" d="M56.5 34H63.5V47H56.5Z"/>
+  <ellipse class="f-skin" cx="60" cy="27" rx="9.5" ry="12"/>
+  <path class="f-hair" d="M50.5 27C50 17 54 13.5 60 13.5C66 13.5 70 17 69.5 27C67 21 63 19.5 57 21C54 22 52 24 50.5 27Z"/>
+  <circle class="f-acc" cx="60" cy="52" r="1.6"/>
+  <circle class="f-acc" cx="50.3" cy="31" r="1.1"/><circle class="f-acc" cx="69.7" cy="31" r="1.1"/>
 </svg>
         <div class="dtext">
           <h3>Nőknek</h3>
-          <div class="dlab ok">Ajánlott</div>
           <ul>
-            <li>Blúz, ing vagy finom kötött felső</li>
-            <li>Blézer vagy kardigán</li>
-            <li>Szövetnadrág, térdig vagy midi hosszúságú szoknya, egyszerű ruha</li>
-            <li>Balerina, loafer, alacsony vagy közepes sarkú cipő</li>
-          </ul>
-          <div class="dlab no">Kerüld</div>
-          <ul class="no">
-            <li>Túl rövid vagy mély kivágású darabok</li>
-            <li>Sportos szabadidőruha, leggings önmagában</li>
-            <li>Strandpapucs, szakadt farmer</li>
+            <li>Blézer</li>
+            <li>Blúz</li>
+            <li>Elegáns nadrág vagy szoknya, kosztüm</li>
+            <li>Elegáns cipő</li>
           </ul>
         </div>
       </div>
@@ -654,7 +693,7 @@ function person(k){
 }
 function session(s){
   let who="";
-  if(s.wave) who=`<div class="who"><div class="person"><span class="ico"><svg width="22" height="22"><use href="#wave"/></svg></span><div class="nm">Tréningblokk</div></div></div>`;
+  if(s.wave) who=`<a class="who wavelink" href="#ctw"><div class="person"><span class="ico"><svg width="22" height="22"><use href="#wave"/></svg></span><div class="nm">Catch the Wave csapat<small>színészes improvizációs tréning</small></div></div></a>`;
   else if(s.stack) who=`<div class="who"><div class="stack">${s.who.map(avatar).join("")}</div><div class="sub">Kerekasztal: ${s.who.length} vezető</div></div>`;
   else who=`<div class="who">${s.who.map(person).join("")}</div>`;
   return `<div class="ses${s.wave?" wave":""}${s.round?" round":""}"><div><h3>${esc(s.title)}</h3>${s.sub?`<div class="sub">${esc(s.sub)}</div>`:""}</div>${who}</div>`;
