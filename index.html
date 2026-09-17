@@ -79,12 +79,15 @@ a{color:inherit}
 .datecard dt{font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600;padding-top:2px}
 .datecard dd{margin:0;font-weight:600}
 .leaves{position:absolute;inset:0;pointer-events:none;z-index:1}
-.leaf{position:absolute;color:var(--hero-accent);opacity:.5}
-.leaf.l2{width:34px;right:6%;top:8%;animation:drift 9s ease-in-out infinite}
-.leaf.l3{width:22px;right:40%;top:14%;color:var(--wine);animation:drift 11s ease-in-out -3s infinite}
-.leaf.l4{width:28px;left:52%;bottom:12%;animation:drift 13s ease-in-out -6s infinite}
-@keyframes drift{0%,100%{transform:translate(0,0) rotate(-12deg)}50%{transform:translate(-14px,18px) rotate(22deg)}}
-@media (prefers-reduced-motion:reduce){.leaf{animation:none!important}}
+.fall{position:absolute;left:0;top:-8%;will-change:top;animation:fall linear infinite}
+.fall .sw{display:block;will-change:transform;animation:sway ease-in-out infinite alternate}
+.fall svg{display:block;width:100%;height:100%}
+@keyframes fall{from{top:-8%}to{top:104%}}
+@keyframes sway{from{transform:translateX(-22px) rotate(-35deg)}to{transform:translateX(22px) rotate(40deg)}}
+.pageleaves{position:fixed;inset:0;z-index:0;pointer-events:none;overflow:hidden}
+.pageleaves .fall{opacity:.13}
+.page > .wrap{position:relative;z-index:1}
+@media (prefers-reduced-motion:reduce){.fall,.fall .sw{animation:none!important}.fall{top:var(--rt)!important}}
 
 /* facts */
 .facts{margin-top:0;display:grid;grid-template-columns:repeat(4,1fr);border-block:1px solid var(--line)}
@@ -295,6 +298,7 @@ body.locked .page{visibility:hidden}
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
   <symbol id="leaf" viewBox="0 0 64 64"><path fill="currentColor" d="M32 2c4 6 11 8 16 6-1 6 2 12 8 14-4 4-5 10-2 15-6 0-10 4-11 9-4-3-9-3-12 1v15h-2V47c-3-4-8-4-12-1-1-5-5-9-11-9 3-5 2-11-2-15 6-2 9-8 8-14 5 2 12 0 16-6z"/></symbol>
+  <symbol id="leaf2" viewBox="0 0 64 64"><path fill="currentColor" d="M8 56C8 28 26 8 58 6c0 30-18 50-46 52l-3 4-3-2 3-4Zm6-4 30-32-2-2-30 32Z"/></symbol>
   <symbol id="wave" viewBox="0 0 24 24"><path fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" d="M2 15c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M2 19c2.5 0 2.5-2 5-2s2.5 2 5 2 2.5-2 5-2 2.5 2 5 2M7 11c0-4 3-7 7-7 2 0 3.5 1 4 2-2 0-4 1-4 3.5"/></symbol>
 </svg>
 
@@ -310,6 +314,7 @@ body.locked .page{visibility:hidden}
   </form>
 </div>
 <div class="page">
+<div class="pageleaves" id="pageLeaves" aria-hidden="true"></div>
 <div class="herowrap">
   <svg class="skyline" viewBox="0 -10 1600 430" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
       <defs>
@@ -371,11 +376,7 @@ body.locked .page{visibility:hidden}
       <g clip-path="url(#waterClip)"><use href="#city" transform="translate(0 720) scale(1 -1)" class="reflect"/></g>
       <g class="ripples" stroke-linecap="round"><path d="M180 376h120M520 384h200M900 380h140M1180 392h160M340 400h90M760 404h120M1040 410h70"/></g>
     </svg>
-  <div class="leaves" aria-hidden="true">
-    <svg class="leaf l2"><use href="#leaf"/></svg>
-    <svg class="leaf l3"><use href="#leaf"/></svg>
-    <svg class="leaf l4"><use href="#leaf"/></svg>
-  </div>
+  <div class="leaves" id="heroLeaves" aria-hidden="true"></div>
   <div class="wrap">
     <header class="bar">
       <div class="brand">SSLD TASSI<b>×</b>LD HERNÁDI</div>
@@ -770,6 +771,23 @@ document.addEventListener("click", e=>{
 mq.addEventListener("change", render);
 renderStatic(); render();
 
+
+/* hulló falevelek */
+(function(){
+  const colors=["#C8742A","#9A4E14","#7B2C2A","#B8923A","#A5552B","#D08A3C"];
+  const rnd=(a,b)=>a+Math.random()*(b-a);
+  function fill(el,n,o){
+    if(!el) return; let h="";
+    for(let i=0;i<n;i++){
+      const size=rnd(o.min,o.max), dur=rnd(o.dmin,o.dmax), sway=rnd(2.6,5.5);
+      h+=`<span class="fall" style="left:${rnd(0,98).toFixed(1)}%;width:${size.toFixed(0)}px;height:${size.toFixed(0)}px;animation-duration:${dur.toFixed(1)}s;animation-delay:-${rnd(0,dur).toFixed(1)}s;--rt:${rnd(2,92).toFixed(0)}%;color:${colors[i%colors.length]}${o.op?`;opacity:${rnd(o.op[0],o.op[1]).toFixed(2)}`:""}"><span class="sw" style="width:100%;height:100%;animation-duration:${sway.toFixed(1)}s;animation-delay:-${rnd(0,sway).toFixed(1)}s"><svg><use href="#${Math.random()<.55?"leaf":"leaf2"}"/></svg></span></span>`;
+    }
+    el.innerHTML=h;
+  }
+  const small=window.matchMedia("(max-width:560px)").matches;
+  fill(document.getElementById("heroLeaves"), small?12:22, {min:14,max:34,dmin:11,dmax:20,op:[.55,.9]});
+  fill(document.getElementById("pageLeaves"), small?6:12, {min:16,max:30,dmin:22,dmax:36});
+})();
 /* jelszó (egyszerű zár) */
 (function(){
   const HASH="e61ae598add502bd2c831236fb22828f";
