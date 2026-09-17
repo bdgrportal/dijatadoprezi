@@ -163,6 +163,28 @@ section{padding-block:clamp(48px,7vw,88px) 0}
 :root[data-theme="dark"] .ev.award{background:#5E2422;border-color:#5E2422}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ev.award{background:#5E2422;border-color:#5E2422}}
 
+/* dress code */
+.dress{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.dcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;grid-template-columns:clamp(90px,11vw,130px) 1fr;gap:22px;align-items:start}
+.fig{width:100%;height:auto;background:linear-gradient(180deg,transparent 55%,var(--accent-soft) 55%,var(--accent-soft) 100%);border-radius:16px;padding:10px 6px 4px}
+.fig .f-ink{fill:var(--ink)}
+.fig .f-skin{fill:#C9A58A}
+.fig .f-light{fill:var(--bg)}
+.fig .f-lapel{fill:var(--ink);stroke:var(--surface);stroke-width:1.2;stroke-linejoin:round}
+.fig .f-pant{fill:var(--moss)}
+.fig .f-skirt{fill:var(--wine)}
+.fig .f-acc{fill:var(--accent)}
+.dtext h3{font-size:1.35rem;font-weight:700;margin-bottom:12px}
+.dlab{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin:12px 0 6px}
+.dlab.ok{color:var(--moss)}
+.dlab.no{color:var(--wine)}
+.dtext ul{margin:0;padding:0;list-style:none;display:flex;flex-direction:column;gap:6px;font-size:.93rem}
+.dtext li{display:flex;gap:8px}
+.dtext li::before{content:"+";flex:none;width:18px;height:18px;margin-top:2px;border-radius:50%;display:grid;place-items:center;font-size:.8rem;font-weight:700;background:var(--moss-soft);color:var(--moss)}
+.dtext ul.no li::before{content:"×";background:var(--wine-soft);color:var(--wine)}
+@media (max-width:860px){.dress{grid-template-columns:1fr}}
+@media (max-width:420px){.dcard{grid-template-columns:1fr}.fig{width:120px}}
+
 /* roundtable */
 .rt{display:grid;grid-template-columns:1fr 1fr 1.1fr;gap:16px}
 .rtbox{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px}
@@ -372,6 +394,76 @@ body.locked .page{visibility:hidden}
     <div class="evening" id="evening"></div>
   </section>
 
+  <section id="dresscode">
+    <div class="sec-head"><div><div class="eyebrow">Dress code</div><h2>Business Casual</h2><p>Elegáns, de nem öltönyös-kosztümös megjelenés: rendezett, letisztult darabok, amelyekben egész nap kényelmesen érzed magad és jól képviseled a csapatot.</p></div></div>
+    <div class="dress">
+      <div class="dcard">
+        <svg class="fig" viewBox="0 0 120 300" role="img" aria-label="Férfi business casual sziluett: blézer, galléros ing, chino nadrág, bőrcipő">
+  <path class="f-ink" d="M44 30a16 17 0 0 1 32 0c0 4-1 7-2 9l-1-9c-6-4-20-4-26 0l-1 9c-1-2-2-5-2-9Z"/>
+  <ellipse class="f-skin" cx="60" cy="32" rx="14" ry="16"/>
+  <path class="f-skin" d="M54 44h12v12H54Z"/>
+  <path class="f-pant" d="M35 146h50l-2 124H67l-7-104-7 104H37Z"/>
+  <path class="f-ink" d="M36 270h19v8H30c0-5 2-8 6-8Z M65 270h19c4 0 6 3 6 8H65Z"/>
+  <path class="f-light" d="M46 56h28l-4 70H50Z"/>
+  <path class="f-ink" d="M34 58q26-10 52 0l10 14 2 80H22l2-80Z"/>
+  <path class="f-light" d="M50 55l10 44 10-44-10 8Z"/>
+  <path class="f-lapel" d="M50 55l-6 18 10 4-4 6 10 16Z M70 55l6 18-10 4 4 6-10 16Z"/>
+  <path class="f-ink" d="M25 70l-9 72h9l10-64Z M95 70l9 72h-9l-10-64Z"/>
+  <circle class="f-skin" cx="20" cy="147" r="5"/><circle class="f-skin" cx="100" cy="147" r="5"/>
+  <path class="f-acc" d="M72 70h8v3h-8Z"/>
+</svg>
+        <div class="dtext">
+          <h3>Férfiaknak</h3>
+          <div class="dlab ok">Ajánlott</div>
+          <ul>
+            <li>Galléros ing vagy galléros póló, ing esetén nyakkendő nélkül is rendben</li>
+            <li>Blézer vagy zakó, nem kötelező, de emeli a megjelenést</li>
+            <li>Chino vagy szövetnadrág, sötét, ép farmer is elfogadható</li>
+            <li>Bőrcipő, loafer vagy letisztult bőr sneaker</li>
+          </ul>
+          <div class="dlab no">Kerüld</div>
+          <ul class="no">
+            <li>Rövidnadrág, melegítő, sportmez</li>
+            <li>Szakadt farmer, feliratos póló</li>
+            <li>Papucs, futócipő</li>
+          </ul>
+        </div>
+      </div>
+      <div class="dcard">
+        <svg class="fig" viewBox="0 0 120 300" role="img" aria-label="Női business casual sziluett: blézer, blúz, midi szoknya, alacsony sarkú cipő">
+  <path class="f-ink" d="M42 34c0-14 8-22 18-22s18 8 18 22v26c-4 2-8 2-10 0V36H52v24c-2 2-6 2-10 0Z"/>
+  <ellipse class="f-skin" cx="60" cy="32" rx="12.5" ry="15"/>
+  <path class="f-skin" d="M55 44h10v12H55Z"/>
+  <path class="f-skin" d="M47 214h9l-1 56h-7Z M64 214h9l-1 56h-7Z"/>
+  <path class="f-ink" d="M46 268h9l1 8H40c0-4 2-7 6-8Z M65 268h9c4 1 6 4 6 8H64Z"/>
+  <path class="f-skirt" d="M39 124h42l12 96H27Z"/>
+  <path class="f-light" d="M46 56h28l-2 70H48Z"/>
+  <path class="f-ink" d="M38 58q22-9 44 0l8 12 2 58-12 2-4-58H44l-4 58-12-2 2-58Z"/>
+  <path class="f-light" d="M52 55l8 26 8-26Z"/>
+  <path class="f-ink" d="M29 70l-8 64h8l9-58Z M91 70l8 64h-8l-9-58Z"/>
+  <circle class="f-skin" cx="25" cy="139" r="4.5"/><circle class="f-skin" cx="95" cy="139" r="4.5"/>
+  <path class="f-acc" d="M58 86h4v4h-4Z"/>
+</svg>
+        <div class="dtext">
+          <h3>Nőknek</h3>
+          <div class="dlab ok">Ajánlott</div>
+          <ul>
+            <li>Blúz, ing vagy finom kötött felső</li>
+            <li>Blézer vagy kardigán</li>
+            <li>Szövetnadrág, térdig vagy midi hosszúságú szoknya, egyszerű ruha</li>
+            <li>Balerina, loafer, alacsony vagy közepes sarkú cipő</li>
+          </ul>
+          <div class="dlab no">Kerüld</div>
+          <ul class="no">
+            <li>Túl rövid vagy mély kivágású darabok</li>
+            <li>Sportos szabadidőruha, leggings önmagában</li>
+            <li>Strandpapucs, szakadt farmer</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <section id="kerekasztal">
     <div class="sec-head"><div><div class="eyebrow">Vasárnap · Vezetők</div><h2 id="rt-title"></h2><p id="rt-lead"></p></div></div>
     <div class="rt" id="rt"></div>
@@ -459,7 +551,7 @@ const P = {
   steinmetz:{r:"GST",n:"Steinmetz Edvárd",f:"steinmetz"},
   gyenge:{r:"BL",n:"Gyenge Ákos",f:"gyenge"},
   kissm:{r:"BL",n:"Kiss Melánia",f:"kissm"},
-  sain:{r:"",n:"Sain Péter",f:"sain"},
+  sain:{r:"BL",n:"Sain Péter",f:"sain"},
   nagyz:{r:"BL",n:"Nagy Zoltán",f:"nagyz"},
   horvath:{r:"RD",n:"Horváth Tamás",f:"horvath"},
   rasnoveanu:{r:"BL",n:"Rasnoveanu Attila",f:"rasnoveanu"}
