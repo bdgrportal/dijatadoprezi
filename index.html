@@ -167,6 +167,29 @@ section{padding-block:clamp(48px,7vw,88px) 0}
 :root[data-theme="dark"] .ev.award{background:#5E2422;border-color:#5E2422}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .ev.award{background:#5E2422;border-color:#5E2422}}
 
+.fee-wrap{display:grid;grid-template-columns:1fr 1fr;gap:16px;align-items:start}
+.feecard h3{font-size:1.4rem;font-weight:800;margin-top:8px}
+.feecard .sub{color:var(--muted);font-size:.9rem;margin-top:6px}
+.chipline{display:flex;flex-wrap:wrap;gap:6px;margin-top:16px}
+.chipline span{font-size:.76rem;background:var(--surface-2);border-radius:999px;padding:4px 10px;color:var(--muted)}
+.totalbox{margin-top:16px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap;border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding-block:12px}
+.totalbox b{font-family:var(--display);font-size:1.5rem;font-weight:800}
+.totalbox span{font-size:.82rem;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.fees{width:100%;border-collapse:collapse;font-size:.95rem;margin-top:16px}
+.fees th{font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:right;padding:0 0 8px;border-bottom:1px solid var(--line)}
+.fees th:first-child{text-align:left}
+.fees td{padding:9px 0;border-bottom:1px solid var(--line)}
+.fees td:not(:first-child){text-align:right;font-family:var(--mono);font-variant-numeric:tabular-nums;white-space:nowrap;padding-left:10px}
+.fees td.sum{font-weight:700}
+.fees s{color:var(--wine);opacity:.75;font-size:.82em;display:block}
+.newtag{font-size:.6rem;font-weight:800;letter-spacing:.08em;background:var(--wine);color:var(--surface);border-radius:4px;padding:1px 5px;margin-left:6px;vertical-align:2px}
+.crit{margin-top:16px;background:var(--accent-soft);border-radius:14px;padding:14px 16px;font-size:.85rem}
+.crit b{display:block;margin-bottom:6px}
+.crit ul{margin:0;padding:0;list-style:none;display:grid;gap:4px}
+.crit li{display:flex;justify-content:space-between;gap:12px}
+.crit li span{font-family:var(--mono);white-space:nowrap}
+@media (max-width:860px){.fee-wrap{grid-template-columns:1fr}}
+
 /* catch the wave */
 .ctw{display:grid;grid-template-columns:1.25fr 1fr;gap:16px}
 .ctw-main{background:var(--moss);color:#F3F1EA;border-radius:20px;padding:clamp(24px,4vw,40px);position:relative;overflow:hidden}
@@ -515,24 +538,25 @@ body.locked .page{visibility:hidden}
   </section>
 
   <section id="info">
-    <div class="two">
-      <div class="card venue">
-        <svg class="vsky" viewBox="0 -10 1600 440" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
-          <circle cx="820" cy="190" r="70" class="vsun"/>
-          <use href="#city" class="vcity"/>
-          <rect x="0" y="360" width="1600" height="70" class="vwater"/>
-        </svg>
-        <div class="eyebrow">Helyszín</div>
-        <h3 style="margin-top:10px" id="v-name"></h3>
-        <p class="muted" id="v-addr" style="margin-top:6px"></p>
-        <p class="small" id="v-note"></p>
-        <a class="btn" id="v-map" target="_blank" rel="noopener">Útvonal a térképen ↗</a>
-      </div>
-      <div class="card">
-        <div class="eyebrow">Önrészek</div>
-        <table class="fees" style="margin-top:12px"><tbody id="fees"></tbody></table>
-        <p class="small" id="fee-note"></p>
-      </div>
+    <div class="card venue">
+      <svg class="vsky" viewBox="0 -10 1600 440" preserveAspectRatio="xMidYMax slice" aria-hidden="true">
+        <circle cx="820" cy="190" r="70" class="vsun"/>
+        <use href="#city" class="vcity"/>
+        <rect x="0" y="360" width="1600" height="70" class="vwater"/>
+      </svg>
+      <div class="eyebrow">Helyszín</div>
+      <h3 style="margin-top:10px" id="v-name"></h3>
+      <p class="muted" id="v-addr" style="margin-top:6px"></p>
+      <p class="small" id="v-note"></p>
+      <a class="btn" id="v-map" target="_blank" rel="noopener">Útvonal a térképen ↗</a>
+    </div>
+  </section>
+
+  <section id="onreszek">
+    <div class="sec-head"><div><div class="eyebrow">Önrészek</div><h2>Önrészek</h2><p>Mindenki a saját igazgatósága szerinti önrésszel számoljon.</p></div></div>
+    <div class="fee-wrap">
+      <div class="card feecard" id="fee-tassi"></div>
+      <div class="card feecard" id="fee-hernadi"></div>
     </div>
   </section>
 
@@ -563,12 +587,51 @@ const EVENT = {
     { k: "Vasárnap", v: "Vezetői nap", s: "+Tassi tanácsadói szekciók" },
     { k: "Szombat este", v: "Díjátadó + party", s: "19:30-23:30", hl: true }
   ],
-  fees: [
-    ["R1 / R2 - 1 napos", null], ["R3 - 1 napos", null], ["R4 / R5 - 1 napos", null], ["GST / GST+ - 1 napos", null],
-    ["GST mérő - 2 napos", null], ["GST - 2 napos", null], ["GST - szoba nélkül", null], ["BL - 2 napos", null],
-    ["BD - 2 napos", null], ["RD - 2 napos", null], ["LD - 2 napos", null], ["Nem regisztrált - 1 napos", null]
-  ],
-  feeNote: "A rendezvény önrésze a következő elszámolás során kerül a jutalékból kompenzálásra. Nem regisztrált munkatársak önrésze a direkt vezető jutalékából kerül kompenzálásra."
+  feesTassi: {
+    org: "LD Tassi igazgatóság",
+    sub: "2 napos rendezvény, R1 - LD",
+    services: ["szállás","folyamatos süti - kávé bekészítés","wellness","előadók díja","2x svédasztalos ebéd","1x svédasztalos reggeli","1x svédasztalos vacsora"],
+    total: "130.000 Ft",
+    rows: [
+      ["R1 - R2 - R3", "45.000 Ft", null, true],
+      ["R1 - R2 - R3", "45.000 Ft"],
+      ["R4 / VR4", "60.000 Ft"],
+      ["R5 / VR5", "60.000 Ft"],
+      ["GS mérő", "60.000 Ft"],
+      ["GS", "60.000 Ft"],
+      ["BL", "90.000 Ft"],
+      ["BD", "135.000 Ft"],
+      ["RD", "175.000 Ft"],
+      ["LD", "250.000 Ft"]
+    ],
+    crit: [
+      ["Új R1 / R2 / R3 (előző negyedévben regisztrált)", "150 ES"],
+      ["Standard R1 / R2 / R3", "600 ES"],
+      ["R4 / VR4 / R5 / VR5", "1.800 ES"],
+      ["GS", "1.800 ES"]
+    ],
+    critNote: "Ha a munkatárs nem teljesítette a negyedéves képzési támogatási kritériumot, magasabb önrész terheli. A támogatás alapja a szemináriumot megelőző negyedév teljesítménye.",
+    note: "Az önrészt az OVB Központ vonja le a következő havi elszámolás során vagy azt követően, minden munkatárs számlát kap róla."
+  },
+  feesHernadi: {
+    org: "LD Hernádi igazgatóság",
+    sub: "Szeminárium és díjátadó önrész külön",
+    rows: [
+      ["R1 - R2", "15.400 Ft", null, "15.400 Ft"],
+      ["R3", "18.700 Ft", null, "18.700 Ft"],
+      ["R4 - R5", "25.300 Ft", null, "25.300 Ft"],
+      ["GST - 1 napos", "30.800 Ft", "28.800 Ft", "59.600 Ft"],
+      ["GST mérő - 2 napos", "38.500 Ft", "28.800 Ft", "67.300 Ft"],
+      ["GST - 2 napos", "49.500 Ft", "28.800 Ft", "78.300 Ft"],
+      ["GST - szoba nélkül", "44.000 Ft", "28.800 Ft", "72.800 Ft"],
+      ["BL", "66.000 Ft", "58.800 Ft", "124.800 Ft"],
+      ["BD", "88.000 Ft", "73.200 Ft", "161.200 Ft"],
+      ["RD", "132.000 Ft", "99.600 Ft", "231.600 Ft"],
+      ["LD", "220.000 Ft", "133.200 Ft", "353.200 Ft"],
+      ["Nem regisztrált", "45.000 Ft", null, "45.000 Ft"]
+    ],
+    note: "Az R1 - R5 szinteken nem szerepelt külön díjátadó önrész. A nem regisztráltaknál a számítás 34.100 Ft-ot adott, a biztonság kedvéért 45.000 Ft-tal számolunk."
+  }
 };
 
 /* Előadók: kulcs → rang, név, fotó (a PHOTOS-ból) */
@@ -729,8 +792,21 @@ function renderStatic(){
   $("#v-addr").textContent = EVENT.venue.addr;
   $("#v-note").textContent = EVENT.venue.note;
   $("#v-map").href = EVENT.venue.map;
-  $("#fees").innerHTML = EVENT.fees.map(([k,v])=>`<tr><td>${esc(k)}</td><td>${v?esc(v):'<span class="tbd">hamarosan</span>'}</td></tr>`).join("");
-  $("#fee-note").textContent = EVENT.feeNote;
+  const T=EVENT.feesTassi, H=EVENT.feesHernadi;
+  $("#fee-tassi").innerHTML =
+    `<div class="eyebrow">Önrész</div><h3>${esc(T.org)}</h3><div class="sub">${esc(T.sub)}</div>`+
+    `<div class="chipline">${T.services.map(x=>`<span>${esc(x)}</span>`).join("")}</div>`+
+    `<div class="totalbox"><span>Teljes költség / fő</span><b>${esc(T.total)}</b></div>`+
+    `<table class="fees"><thead><tr><th>Szint</th><th>Önrész</th></tr></thead><tbody>`+
+    T.rows.map(([k,v,s2,nw])=>`<tr><td>${esc(k)}${nw?'<span class="newtag">ÚJ</span>':""}</td><td>${esc(v)}${s2?`<s>${esc(s2)}</s>`:""}</td></tr>`).join("")+
+    `</tbody></table>`+
+    `<div class="crit"><b>Negyedéves képzési támogatási kritérium</b><ul>${T.crit.map(([k,v])=>`<li>${esc(k)}<span>${esc(v)}</span></li>`).join("")}</ul></div>`+
+    `<p class="small">${esc(T.critNote)}</p><p class="small">${esc(T.note)}</p>`;
+  $("#fee-hernadi").innerHTML =
+    `<div class="eyebrow">Önrész</div><h3>${esc(H.org)}</h3><div class="sub">${esc(H.sub)}</div>`+
+    `<table class="fees"><thead><tr><th>Szint</th><th>Szeminárium</th><th>Díjátadó</th><th>Összesen</th></tr></thead><tbody>`+
+    H.rows.map(([k,a,b,c])=>`<tr><td>${esc(k)}</td><td>${esc(a)}</td><td>${b?esc(b):"-"}</td><td class="sum">${esc(c)}</td></tr>`).join("")+
+    `</tbody></table><p class="small">${esc(H.note)}</p>`;
   $("#f-left").textContent = `${EVENT.quarter} · ${EVENT.venue.name}`;
   $("#f-right").textContent = "SSLD Tassi × LD Hernádi igazgatóság";
 }
