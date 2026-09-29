@@ -272,6 +272,41 @@ a.wavelink:hover .nm{text-decoration:underline}
 .tickcard b{font-family:var(--display);font-size:1.6rem;color:var(--accent);line-height:1}
 @media (max-width:860px){.social{grid-template-columns:1fr}.gal{grid-template-columns:repeat(auto-fill,minmax(46%,1fr))}}
 
+/* élő fotófolyam */
+.stream{position:relative;width:100vw;margin-inline:calc(50% - 50vw);overflow:hidden;padding-block:6px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
+.stream .track{display:flex;gap:12px;width:max-content;animation:slide 60s linear infinite}
+.stream:hover .track{animation-play-state:paused}
+.stream figure{margin:0;position:relative;width:min(46vw,260px);aspect-ratio:4/3;border-radius:16px;overflow:hidden;background:var(--surface-2);flex:none}
+.stream img{width:100%;height:100%;object-fit:cover;display:block}
+.stream figcaption{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;font-size:.72rem;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.76))}
+.stream .empty{padding:26px 0;color:var(--muted);font-size:.92rem}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@media (prefers-reduced-motion:reduce){.stream .track{animation:none;overflow-x:auto}}
+
+/* vezetői belépés */
+.adminlink{all:unset;cursor:pointer;font-size:.8rem;color:var(--muted);border-bottom:1px dotted var(--line)}
+.adminlink:hover{color:var(--accent)}
+.adminwrap{position:fixed;inset:0;z-index:80;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch}
+.adminbar{position:sticky;top:0;z-index:2;background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.adminbar .in{max-width:1000px;margin:0 auto;padding:14px 16px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.adminbar h2{font-size:1.2rem;font-weight:800}
+.abtn{all:unset;cursor:pointer;border:1px solid var(--line);border-radius:999px;padding:9px 14px;font-size:.85rem;font-weight:700;background:var(--surface)}
+.abtn.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.adminbody{max-width:1000px;margin:0 auto;padding:16px 16px 60px}
+.astats{display:grid;grid-template-columns:repeat(auto-fit,minmax(110px,1fr));gap:10px}
+.astat{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.astat b{font-family:var(--display);font-size:1.5rem;display:block;line-height:1.1}
+.astat span{font-size:.75rem;color:var(--muted)}
+.aitem{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:14px 16px;margin-top:10px}
+.aitem .m{font-size:.78rem;color:var(--muted);display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.aitem .m b{color:var(--ink)}
+.aitem .tx{margin-top:8px;white-space:pre-wrap;line-height:1.5}
+.aitem img{width:160px;border-radius:12px;margin-top:10px;display:block}
+.aitem.hid{opacity:.45}
+.live{display:inline-flex;align-items:center;gap:6px;font-size:.75rem;color:var(--moss);font-weight:700}
+.live::before{content:"";width:8px;height:8px;border-radius:50%;background:var(--moss);animation:pulse 1.8s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.25}}
+
 /* dress code */
 .dress{display:grid;grid-template-columns:1fr 1fr;gap:16px}
 .dcard{background:var(--surface);border:1px solid var(--line);border-radius:20px;padding:24px;display:grid;grid-template-columns:clamp(90px,11vw,130px) 1fr;gap:22px;align-items:start}
@@ -667,13 +702,18 @@ body.locked .page{visibility:hidden}
         <p class="statusline" id="fbst"></p>
       </div>
     </div>
-    <div class="gal" id="gal"></div>
     <div class="tickcard" id="tickbar"></div>
+  </section>
+
+  <section id="folyam" aria-label="Élő fotófolyam">
+    <div class="sec-head"><div><h2>Élő fotófolyam</h2></div></div>
+    <div class="stream" id="stream"><div class="track" id="track"></div></div>
   </section>
 
   <footer>
     <div class="see">Ott<br>találkozunk<span>!</span></div>
-    <div class="meta"><span id="f-left"></span><span id="f-right"></span></div>
+    <div class="meta"><span id="f-left"></span><span id="f-right"></span>
+      <button class="adminlink" id="adminOpen">Vezetői belépés</button></div>
   </footer>
 </div>
 </div>
@@ -987,7 +1027,7 @@ async function loadEntries(){
   const { data, error } = await SB.from("entries").select("*").order("created_at",{ascending:false}).limit(600);
   if(error){ console.error(error); return; }
   ENTRIES = data||[];
-  paintGallery(); paintTickets();
+  paintGallery(); paintTickets(); if(typeof drawAdmin==="function") drawAdmin();
 }
 function photoUrl(path){ return SB.storage.from("fotok").getPublicUrl(path).data.publicUrl; }
 async function saveEntry(row){
@@ -1006,7 +1046,18 @@ function paintTickets(){
   const open = Date.now() < new Date(RAFFLE_CLOSE).getTime();
   el.innerHTML = `<b>${myTickets()}</b><span>sorsjegyed van${open?" · a gyűjtés szombat 19:00-kor zár":" · a gyűjtés lezárult"}<br><span style="color:var(--muted)">3 mystery box sorsolása szerencsekeréken</span></span>`;
 }
+function paintStream(){
+  const el=document.getElementById("track"); if(!el) return;
+  const ph = ENTRIES.filter(e=>e.kind==="photo" && !e.hidden);
+  if(!ph.length){ el.innerHTML=`<div class="empty">Még nincs kép. Tölts fel egyet a fotófalra, és itt azonnal megjelenik.</div>`; el.style.animation="none"; return; }
+  el.style.animation="";
+  const one = ph.map(p=>`<figure><img loading="lazy" src="${photoUrl(p.photo_path)}" alt="">
+    <figcaption>${esc(p.body||"")}${p.body?" · ":""}${esc(p.name||"")}</figcaption></figure>`).join("");
+  el.innerHTML = one + one;
+  el.style.animationDuration = Math.max(28, ph.length*9) + "s";
+}
 function paintGallery(){
+  paintStream();
   const el=document.getElementById("gal"); if(!el) return;
   const ph = ENTRIES.filter(e=>e.kind==="photo" && !e.hidden).slice(0,24);
   if(!ph.length){ el.innerHTML = `<p class="statusline" style="grid-column:1/-1">Még nincs kép a falon. Legyél te az első!</p>`; return; }
@@ -1099,60 +1150,100 @@ function wireSocial(){
     fb.disabled=false;
   };
 }
-/* --- vezetői nézet: #vezeto --- */
-async function adminView(){
-  const pass = prompt("Vezetői jelszó:"); if(!pass) { location.hash=""; return; }
+/* --- vezetői nézet --- */
+let ADMIN = null;                       // {pass, filter, box}
+async function checkPass(pass){
+  if(!SB) return false;
+  const { error } = await SB.rpc("moderate",{p_id:"00000000-0000-0000-0000-000000000000", p_hidden:false, p_pass:pass});
+  return !error;
+}
+function openAdminLogin(){
+  const m=modal(`<div class="eyebrow">Vezetői belépés</div><h3>Add meg a jelszót</h3>
+    <div class="fld"><label for="apw">Jelszó</label><input id="apw" type="password" autocomplete="off"></div>
+    <button class="act" id="ago">Belépés</button><button class="act sec" id="acl">Mégse</button>
+    <p class="statusline" id="aerr"></p>`);
+  m.querySelector("#acl").onclick=()=>m.remove();
+  const go = async ()=>{
+    const pw=m.querySelector("#apw").value.trim(); if(!pw) return;
+    m.querySelector("#ago").disabled=true; m.querySelector("#aerr").textContent="Ellenőrzés...";
+    if(await checkPass(pw)){ m.remove(); openAdmin(pw); }
+    else { m.querySelector("#aerr").textContent="Hibás jelszó."; m.querySelector("#ago").disabled=false; }
+  };
+  m.querySelector("#ago").onclick=go;
+  m.querySelector("#apw").addEventListener("keydown",e=>{ if(e.key==="Enter") go(); });
+}
+async function openAdmin(pass){
   await loadEntries();
-  const box=document.createElement("div");
-  box.style.cssText="position:fixed;inset:0;z-index:100;background:var(--bg);overflow:auto;padding:20px";
-  const avg = a => a.length ? (a.reduce((s,e)=>s+(e.rating||0),0)/a.length).toFixed(1) : "-";
-  const fb=ENTRIES.filter(e=>e.kind==="feedback");
-  const people=[...new Map(ENTRIES.filter(e=>!e.hidden).map(e=>[e.device_id,e.name||"?"])).entries()]
+  const box=document.createElement("div"); box.className="adminwrap";
+  box.innerHTML=`<div class="adminbar"><div class="in">
+      <div><h2>Vezetői nézet</h2><span class="live">élő</span></div>
+      <div style="display:flex;gap:8px;flex-wrap:wrap">
+        <button class="abtn" data-f="mind">Mind</button>
+        <button class="abtn" data-f="feedback">Értékelés</button>
+        <button class="abtn" data-f="idea">Visszajelzés</button>
+        <button class="abtn" data-f="photo">Fotó</button>
+        <button class="abtn" id="acsv">CSV</button>
+        <button class="abtn" id="awheel">Kerék</button>
+        <button class="abtn" id="aclose">Bezár</button>
+      </div></div></div>
+    <div class="adminbody"><div class="astats" id="astats"></div><div id="alist"></div></div>`;
+  document.body.appendChild(box);
+  ADMIN={pass, filter:"mind", box};
+  box.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ ADMIN.filter=b.dataset.f; drawAdmin(); });
+  box.querySelector("#aclose").onclick=()=>{ box.remove(); ADMIN=null; };
+  box.querySelector("#acsv").onclick=()=>{
+    const csv="idopont;nev;tipus;eloadas;pont;szoveg\n"+ENTRIES.map(e=>[new Date(e.created_at).toLocaleString("hu-HU"),e.name||"",e.kind,e.block_key||"",e.rating||"",(e.body||"").replace(/[\n;]/g," ")].join(";")).join("\n");
+    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv"})); a.download="visszajelzesek.csv"; a.click(); };
+  box.querySelector("#awheel").onclick=()=>spinWheel(peopleTable());
+  drawAdmin();
+}
+function peopleTable(){
+  return [...new Map(ENTRIES.filter(e=>!e.hidden).map(e=>[e.device_id, e.name||"?"])).entries()]
     .map(([dev,name])=>{ const mine=ENTRIES.filter(x=>x.device_id===dev&&!x.hidden);
       const t=Math.min(new Set(mine.filter(x=>x.kind==="feedback").map(x=>x.block_key)).size,10)
              +Math.min(mine.filter(x=>x.kind==="photo").length,3)+Math.min(mine.filter(x=>x.kind==="idea").length,2);
       return {dev,name,t}; }).filter(x=>x.t>0).sort((a,b)=>b.t-a.t);
-  box.innerHTML=`<div class="wrap" style="padding-block:10px">
-    <div class="row" style="display:flex;justify-content:space-between;align-items:center">
-      <h2 style="font-size:1.6rem">Vezetői nézet</h2>
-      <div><button class="mbtn" id="csv" style="width:auto;display:inline-block;padding:10px 16px;margin:0">CSV</button>
-      <button class="mbtn" id="wheel" style="width:auto;display:inline-block;padding:10px 16px;margin:0 0 0 8px">Szerencsekerék</button>
-      <button class="mbtn ghost" id="close" style="width:auto;display:inline-block;padding:10px 16px;margin:0 0 0 8px">Bezár</button></div></div>
-    <div class="stats" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:10px;margin-top:14px">
-      <div class="card"><b style="font-family:var(--display);font-size:1.6rem">${people.length}</b><div class="small">aktív fő</div></div>
-      <div class="card"><b style="font-family:var(--display);font-size:1.6rem">${fb.length}</b><div class="small">értékelés</div></div>
-      <div class="card"><b style="font-family:var(--display);font-size:1.6rem">${avg(fb)}</b><div class="small">átlag (1-10)</div></div>
-      <div class="card"><b style="font-family:var(--display);font-size:1.6rem">${ENTRIES.filter(e=>e.kind==="photo").length}</b><div class="small">fotó</div></div>
-      <div class="card"><b style="font-family:var(--display);font-size:1.6rem">${ENTRIES.filter(e=>e.kind==="idea").length}</b><div class="small">visszajelzés</div></div>
-    </div>
-    <div id="alist" style="margin-top:18px;display:grid;gap:10px"></div></div>`;
-  document.body.appendChild(box);
-  const list=box.querySelector("#alist");
-  const draw=()=>{ list.innerHTML=ENTRIES.map(e=>`<div class="card" style="${e.hidden?"opacity:.45":""}">
-      <div class="small"><b>${esc(e.name||"?")}</b> · ${new Date(e.created_at).toLocaleString("hu-HU")} · ${({feedback:"értékelés",photo:"fotó",idea:"visszajelzés"})[e.kind]||e.kind}
-      ${e.rating?` · <b>${e.rating}/10</b>`:""} ${e.block_key?` · ${esc(e.block_key)}`:""}</div>
-      ${e.body?`<div style="margin-top:6px;white-space:pre-wrap">${esc(e.body)}</div>`:""}
-      ${e.photo_path?`<img src="${photoUrl(e.photo_path)}" style="width:180px;border-radius:10px;margin-top:8px">`:""}
-      <button class="mbtn ghost" data-h="${e.id}" data-v="${e.hidden?0:1}" style="width:auto;display:inline-block;padding:6px 12px;margin-top:8px">${e.hidden?"Vissza":"Elrejt"}</button>
-    </div>`).join("");
-    list.querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{
-      const { error }=await SB.rpc("moderate",{p_id:b.dataset.h,p_hidden:b.dataset.v==="1",p_pass:pass});
-      if(error){ toast("Hibás jelszó"); return; } await loadEntries(); draw(); });
-  };
-  draw();
-  box.querySelector("#close").onclick=()=>{ box.remove(); location.hash=""; };
-  box.querySelector("#csv").onclick=()=>{
-    const csv="idopont;nev;tipus;elaodas;pont;szoveg\n"+ENTRIES.map(e=>[new Date(e.created_at).toLocaleString("hu-HU"),e.name,e.kind,e.block_key||"",e.rating||"",(e.body||"").replace(/[\n;]/g," ")].join(";")).join("\n");
-    const a=document.createElement("a"); a.href=URL.createObjectURL(new Blob(["\ufeff"+csv],{type:"text/csv"})); a.download="visszajelzesek.csv"; a.click(); };
-  box.querySelector("#wheel").onclick=()=>spinWheel(box, people);
 }
-function spinWheel(box, people){
-  const { data:x } = {};
+function drawAdmin(){
+  if(!ADMIN) return;
+  const {box, filter} = ADMIN;
+  box.querySelectorAll("[data-f]").forEach(b=>b.classList.toggle("on", b.dataset.f===filter));
+  const fb=ENTRIES.filter(e=>e.kind==="feedback");
+  const avg = a => a.length ? (a.reduce((s,e)=>s+(e.rating||0),0)/a.length).toFixed(1) : "-";
+  const ppl = peopleTable();
+  box.querySelector("#astats").innerHTML = `
+    <div class="astat"><b>${ppl.length}</b><span>aktív fő</span></div>
+    <div class="astat"><b>${fb.length}</b><span>értékelés</span></div>
+    <div class="astat"><b>${avg(fb)}</b><span>átlag (1-10)</span></div>
+    <div class="astat"><b>${ENTRIES.filter(e=>e.kind==="photo").length}</b><span>fotó</span></div>
+    <div class="astat"><b>${ENTRIES.filter(e=>e.kind==="idea").length}</b><span>visszajelzés</span></div>
+    <div class="astat"><b>${ppl.reduce((s,r)=>s+r.t,0)}</b><span>sorsjegy</span></div>`;
+  const label={feedback:"értékelés",photo:"fotó",idea:"visszajelzés"};
+  const list=ENTRIES.filter(e=>filter==="mind"||e.kind===filter);
+  box.querySelector("#alist").innerHTML = list.map(e=>`
+    <div class="aitem${e.hidden?" hid":""}">
+      <div class="m"><b>${esc(e.name||"?")}</b><span>${new Date(e.created_at).toLocaleString("hu-HU")}</span>
+        <span class="pill">${label[e.kind]||e.kind}</span>
+        ${e.rating?`<span class="pill tick">${e.rating}/10</span>`:""}
+        ${e.block_key?`<span class="pill">${esc(blockTitle(e.block_key))}</span>`:""}</div>
+      ${e.body?`<div class="tx">${esc(e.body)}</div>`:""}
+      ${e.photo_path?`<img src="${photoUrl(e.photo_path)}" alt="">`:""}
+      <button class="abtn" data-h="${e.id}" data-v="${e.hidden?0:1}" style="margin-top:10px">${e.hidden?"Vissza":"Elrejt"}</button>
+    </div>`).join("") || `<p class="statusline">Még nincs beküldés ebben a nézetben.</p>`;
+  box.querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{
+    const { error }=await SB.rpc("moderate",{p_id:b.dataset.h,p_hidden:b.dataset.v==="1",p_pass:ADMIN.pass});
+    if(error){ toast("Nem sikerült"); return; } await loadEntries(); drawAdmin(); });
+}
+function blockTitle(k){
+  for(const d of DAYS) for(const r of d.rows) for(const c of (r.c||[])) if(slug(c.title)===k) return c.title;
+  return k;
+}
+function spinWheel(people){
   let field=people.slice();
   const m=modal(`<div class="eyebrow">Sorsolás</div><h3>Mystery box kerék</h3>
     <svg id="wh" viewBox="0 0 400 400" style="width:100%;max-width:420px;margin:14px auto;display:block"></svg>
-    <div id="wn" style="font-family:var(--display);font-size:1.8rem;font-weight:800;text-align:center;color:var(--accent);min-height:2rem"></div>
-    <button class="mbtn" id="go">Pörgetés</button><button class="mbtn ghost" id="cl">Bezár</button>`);
+    <div id="wn" style="font-family:var(--display);font-size:1.7rem;font-weight:800;text-align:center;color:var(--accent);min-height:2rem"></div>
+    <button class="act" id="go">Pörgetés</button><button class="act sec" id="cl">Bezár</button>`);
   const svg=m.querySelector("#wh");
   const draw=(rot=0)=>{ const tot=field.reduce((s,r)=>s+r.t,0)||1; let ang=-90, parts="";
     const cols=["#B06A12","#3E5B47","#7B2C2A","#8C6B3A","#4E6B57","#A0522D"];
@@ -1160,7 +1251,7 @@ function spinWheel(box, people){
       const x1=200+R*Math.cos(rad(ang)), y1=200+R*Math.sin(rad(ang)), x2=200+R*Math.cos(rad(e)), y2=200+R*Math.sin(rad(e));
       parts+=`<path d="M200 200 L${x1.toFixed(1)} ${y1.toFixed(1)} A180 180 0 ${a>180?1:0} 1 ${x2.toFixed(1)} ${y2.toFixed(1)} Z" fill="${cols[i%6]}" stroke="#fff" stroke-width="1.5"/>`;
       if(a>10){ const mid=rad(ang+a/2), tx=200+118*Math.cos(mid), ty=200+118*Math.sin(mid);
-        parts+=`<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" fill="#fff" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(${(ang+a/2+90).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)})">${esc(r.name.split(" ")[0])}</text>`; }
+        parts+=`<text x="${tx.toFixed(1)}" y="${ty.toFixed(1)}" fill="#fff" font-size="11" font-weight="700" text-anchor="middle" transform="rotate(${(ang+a/2+90).toFixed(1)} ${tx.toFixed(1)} ${ty.toFixed(1)})">${esc(String(r.name).split(" ")[0])}</text>`; }
       ang=e; });
     svg.innerHTML=`<g transform="rotate(${rot} 200 200)">${parts}</g>
       <circle cx="200" cy="200" r="32" fill="#F8F6F1" stroke="#D5D0C2"/>
@@ -1176,14 +1267,16 @@ function spinWheel(box, people){
     const step=t=>{ const p=Math.min(1,(t-t0)/5000), e=1-Math.pow(1-p,4); draw(target*e);
       if(p<1) requestAnimationFrame(step); else { m.querySelector("#wn").textContent="🎁 "+win.name;
         if(SB) SB.from("raffle").insert({round:1, winner_name:win.name, winner_device:win.dev});
-        field=field.filter(r=>r.dev!==win.dev); m.querySelector("#go").disabled=false; } };
+        field=field.filter(r=>r.dev!==win.dev); draw(); m.querySelector("#go").disabled=false; } };
     requestAnimationFrame(step);
   };
 }
 wireSocial(); loadEntries();
-if(SB) SB.channel("live").on("postgres_changes",{event:"*",schema:"public",table:"entries"},()=>loadEntries()).subscribe();
-if(location.hash==="#vezeto") adminView();
-window.addEventListener("hashchange",()=>{ if(location.hash==="#vezeto") adminView(); });
+document.getElementById("adminOpen")?.addEventListener("click", openAdminLogin);
+if(SB) SB.channel("live").on("postgres_changes",{event:"*",schema:"public",table:"entries"},async()=>{ await loadEntries(); drawAdmin(); }).subscribe();
+setInterval(async()=>{ if(ADMIN){ await loadEntries(); drawAdmin(); } }, 20000);
+if(location.hash==="#vezeto") openAdminLogin();
+window.addEventListener("hashchange",()=>{ if(location.hash==="#vezeto") openAdminLogin(); });
 
 
 
