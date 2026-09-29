@@ -491,6 +491,86 @@ body.locked .page{visibility:hidden}
 .atable td:nth-child(2),.atable td:nth-child(3){font-family:var(--mono);white-space:nowrap}
 .atable b.good{color:var(--moss)} .atable b.mid{color:var(--accent)} .atable b.bad{color:var(--wine)}
 @media (max-width:620px){ .atable th:nth-child(2),.atable td:nth-child(2){display:none} }
+
+/* =============== MOZGÁS: Apple-szerű finom animációk =============== */
+:root{ --ease:cubic-bezier(.16,1,.3,1); --ease2:cubic-bezier(.34,1.56,.64,1); }
+
+/* görgetésre megjelenés */
+.js-anim .reveal{opacity:0;transform:translateY(22px) scale(.99);will-change:opacity,transform}
+.js-anim .reveal.in{opacity:1;transform:none;transition:opacity .8s var(--ease),transform .8s var(--ease)}
+
+/* kártyák, gombok tapintása */
+.card,.dcard,.feecard,.aitem,.ev,.rtbox,.ctw-quotes blockquote{transition:transform .4s var(--ease),box-shadow .4s var(--ease),border-color .3s ease}
+@media (hover:hover){
+  .card:hover,.dcard:hover,.ev:hover,.rtbox:hover,.ctw-quotes blockquote:hover{transform:translateY(-4px);box-shadow:0 18px 40px -26px rgba(0,0,0,.45)}
+  .ses:hover{transform:translateY(-2px)}
+  .sp:hover .av{transform:scale(1.06) rotate(-2deg)}
+  .gal figure:hover img,.stream figure:hover img{transform:scale(1.06)}
+}
+.ses{transition:transform .35s var(--ease),background .3s ease}
+.sp .av{transition:transform .45s var(--ease2)}
+.gal img,.stream img{transition:transform .6s var(--ease),opacity .6s ease}
+.act,.rate,.btn,.chip,.abtn,.qmenu button,.scale button,.filelabel{transition:transform .18s var(--ease2),background .2s ease,color .2s ease,border-color .2s ease,box-shadow .2s ease}
+.act:active,.rate:active,.btn:active,.chip:active,.abtn:active,.qmenu button:active,.scale button:active,.filelabel:active{transform:scale(.96)}
+.scale button.on{animation:pop .32s var(--ease2)}
+@keyframes pop{0%{transform:scale(.8)}60%{transform:scale(1.12)}100%{transform:scale(1)}}
+
+/* betöltődő képek */
+img.fade{opacity:0}
+img.fade.ready{opacity:1}
+
+/* hero: finom belépő */
+.js-anim .hero .eyebrow{animation:up .9s var(--ease) both .05s}
+.js-anim .hero h1{animation:up 1s var(--ease) both .15s}
+.js-anim .hero .place{animation:up 1s var(--ease) both .3s}
+.js-anim .datecard{animation:up 1.1s var(--ease) both .25s}
+.js-anim .skyline{animation:skyIn 1.6s var(--ease) both}
+.js-anim .facts .fact{animation:up .9s var(--ease) both}
+.js-anim .facts .fact:nth-child(2){animation-delay:.08s}
+.js-anim .facts .fact:nth-child(3){animation-delay:.16s}
+.js-anim .facts .fact:nth-child(4){animation-delay:.24s}
+@keyframes up{from{opacity:0;transform:translateY(26px)}to{opacity:1;transform:none}}
+@keyframes skyIn{from{opacity:0;transform:translateY(40px) scale(1.04)}to{opacity:1;transform:none}}
+
+/* parallax rétegek */
+.skyline,.leaves{will-change:transform}
+
+/* fejléc: görgetéskor letisztul */
+.bar{transition:padding .35s var(--ease)}
+.herowrap.scrolled .bar{padding-block:12px}
+.herowrap.scrolled .brand{font-size:.86rem}
+
+/* modális: rugós belépő */
+.modal{animation:fadeIn .25s ease both}
+.modal .box{animation:sheetIn .5s var(--ease) both}
+@keyframes fadeIn{from{opacity:0}to{opacity:1}}
+@keyframes sheetIn{from{opacity:0;transform:translateY(40px) scale(.97)}to{opacity:1;transform:none}}
+
+/* lenyíló blokkok: sima magasságváltás */
+@media (max-width:860px){
+  .secbody{display:grid!important;grid-template-rows:0fr;transition:grid-template-rows .5s var(--ease),opacity .35s ease;opacity:0}
+  .secbody > .secinner{overflow:hidden;min-height:0}
+  section[data-collapsible].open .secbody{grid-template-rows:1fr;opacity:1;animation:none}
+  section[data-collapsible] .sec-toggle .chev{transition:transform .45s var(--ease2),color .3s,border-color .3s}
+  section[data-collapsible]:active .sec-head{transform:scale(.995)}
+}
+
+/* sorsjegy szám változásra */
+.tickcard b{transition:transform .4s var(--ease2)}
+.tickcard.bumped b{animation:pop .5s var(--ease2)}
+
+/* toast */
+.toastin{animation:toastIn .45s var(--ease2) both}
+@keyframes toastIn{from{opacity:0;transform:translate(-50%,16px) scale(.96)}to{opacity:1;transform:translate(-50%,0) scale(1)}}
+
+/* vezetői elemek */
+.aitem{animation:up .5s var(--ease) both}
+.astat{animation:up .6s var(--ease) both}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{animation-duration:.001ms!important;animation-iteration-count:1!important;transition-duration:.001ms!important}
+  .js-anim .reveal{opacity:1!important;transform:none!important}
+}
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -995,7 +1075,7 @@ const remember = k => { MY.add(k); store.set("sz-my", [...MY]); };
 let MYC = store.get("sz-count", {photo:0, idea:0});
 const bump = k => { MYC[k]=(MYC[k]||0)+1; store.set("sz-count", MYC); };
 let ENTRIES = [];
-function toast(m){ const t=document.createElement("div"); t.textContent=m;
+function toast(m){ const t=document.createElement("div"); t.className="toastin"; t.textContent=m;
   t.style.cssText="position:fixed;left:50%;transform:translateX(-50%);bottom:24px;z-index:90;background:var(--ink);color:var(--bg);padding:12px 18px;border-radius:12px;font-weight:600;box-shadow:var(--shadow)";
   document.body.appendChild(t); setTimeout(()=>t.remove(),2600); }
 const initials = n => n.replace(/\./g,"").split(" ").map(w=>w[0]).slice(0,2).join("");
@@ -1127,7 +1207,10 @@ function myTickets(){
 function paintTickets(){
   const el=document.getElementById("tickbar"); if(!el) return;
   const open = Date.now() < new Date(RAFFLE_CLOSE).getTime();
-  el.innerHTML = `<b>${myTickets()}</b><span>sorsjegyed van${open?" · a gyűjtés szombat 19:00-kor zár":" · a gyűjtés lezárult"}<br><span style="color:var(--muted)">3 db meglepetés ajándék sorsolása szerencsekeréken</span></span>`;
+  const prev = +(el.dataset.n||0), now = myTickets();
+  if(now>prev){ el.classList.add("bumped"); setTimeout(()=>el.classList.remove("bumped"),600); }
+  el.dataset.n = now;
+  el.innerHTML = `<b>${now}</b><span>sorsjegyed van${open?" · a gyűjtés szombat 19:00-kor zár":" · a gyűjtés lezárult"}<br><span style="color:var(--muted)">3 db meglepetés ajándék sorsolása szerencsekeréken</span></span>`;
 }
 function paintStream(){
   const el=document.getElementById("track"); if(!el) return;
@@ -1465,8 +1548,9 @@ function setupCollapse(){
       head.appendChild(inner); sec.insertBefore(head, sec.firstChild);
     }
     const body=document.createElement("div"); body.className="secbody";
-    [...sec.children].forEach(ch=>{ if(ch!==head) body.appendChild(ch); });
-    sec.appendChild(body);
+    const inner2=document.createElement("div"); inner2.className="secinner";
+    [...sec.children].forEach(ch=>{ if(ch!==head) inner2.appendChild(ch); });
+    body.appendChild(inner2); sec.appendChild(body);
     const inner=head.firstElementChild;
     const wrap=document.createElement("div"); wrap.className="sec-toggle";
     head.insertBefore(wrap, inner); wrap.appendChild(inner);
@@ -1496,6 +1580,51 @@ function buildMenu(){
   el.querySelectorAll("button").forEach(b=>b.onclick=()=>openSection(b.dataset.s));
 }
 setupCollapse(); buildMenu(); syncMenu();
+
+
+/* =============== MOZGÁSRÉTEG =============== */
+(function(){
+  const reduce = window.matchMedia("(prefers-reduced-motion:reduce)").matches;
+  if(reduce) return;
+  document.documentElement.classList.add("js-anim");
+
+  /* 1) görgetésre megjelenés */
+  const io = new IntersectionObserver((es)=>{
+    es.forEach(e=>{ if(e.isIntersecting){ e.target.classList.add("in"); io.unobserve(e.target); } });
+  },{rootMargin:"0px 0px -8% 0px", threshold:.08});
+  const markReveal = ()=>{
+    document.querySelectorAll("section .card, section .dcard, section .ev, section .rtbox, section .sp, section .feecard, .ctw-main, .ctw-quotes blockquote, .sec-head > div, .gridwrap, .plist .prow")
+      .forEach((el,i)=>{ if(el.dataset.rv) return; el.dataset.rv="1"; el.classList.add("reveal");
+        el.style.transitionDelay = Math.min(i%6*60, 300)+"ms"; io.observe(el); });
+  };
+  markReveal();
+  window.__markReveal = markReveal;
+
+  /* 2) parallax a heroban */
+  const sky=document.querySelector(".skyline"), leaves=document.querySelector(".leaves"), heroWrap=document.querySelector(".herowrap");
+  let ticking=false;
+  const onScroll=()=>{
+    if(ticking) return; ticking=true;
+    requestAnimationFrame(()=>{
+      const y=window.scrollY||0;
+      if(y<1400){
+        if(sky) sky.style.transform=`translate3d(0,${(y*0.12).toFixed(1)}px,0)`;
+        if(leaves) leaves.style.transform=`translate3d(0,${(y*0.22).toFixed(1)}px,0)`;
+      }
+      if(heroWrap) heroWrap.classList.toggle("scrolled", y>90);
+      ticking=false;
+    });
+  };
+  window.addEventListener("scroll", onScroll, {passive:true}); onScroll();
+
+  /* 3) képek lágy betöltése */
+  const fadeImgs=()=>document.querySelectorAll(".gal img, .stream img, .aitem img").forEach(im=>{
+    if(im.dataset.fd) return; im.dataset.fd="1"; im.classList.add("fade");
+    if(im.complete) im.classList.add("ready"); else im.addEventListener("load",()=>im.classList.add("ready"),{once:true});
+  });
+  window.__fadeImgs=fadeImgs; fadeImgs();
+  new MutationObserver(()=>{ fadeImgs(); markReveal(); }).observe(document.body,{childList:true,subtree:true});
+})();
 
 wireSocial(); loadEntries();
 document.getElementById("adminOpen")?.addEventListener("click", openAdminLogin);
