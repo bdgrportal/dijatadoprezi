@@ -285,8 +285,8 @@ a.wavelink:hover .nm{text-decoration:underline}
 @media (prefers-reduced-motion:reduce){.stream .track{animation:none;overflow-x:auto}}
 
 /* vezetői belépés */
-.adminlink{all:unset;cursor:pointer;font-size:.8rem;color:var(--muted);border-bottom:1px dotted var(--line)}
-.adminlink:hover{color:var(--accent)}
+.adminlink{all:unset;cursor:pointer;font-size:.76rem;font-weight:600;letter-spacing:.02em;color:var(--hero-muted);border:1px solid var(--hero-line);border-radius:999px;padding:6px 11px;min-height:34px;display:inline-flex;align-items:center;gap:4px}
+.adminlink:hover{color:var(--hero-ink);border-color:var(--hero-ink)}
 .adminwrap{position:fixed;inset:0;z-index:80;background:var(--bg);overflow:auto;-webkit-overflow-scrolling:touch}
 .adminbar{position:sticky;top:0;z-index:2;background:color-mix(in srgb,var(--bg) 92%,transparent);-webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .adminbar .in{max-width:1000px;margin:0 auto;padding:14px 16px;display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
@@ -478,6 +478,19 @@ body.locked .page{visibility:hidden}
   @keyframes fadein{from{opacity:0;transform:translateY(-4px)}to{opacity:1;transform:none}}
   #jatek.hi{padding-block:18px}
 }
+
+/* vezetői szűrők */
+.afilter{display:grid;gap:10px;margin:16px 0 4px}
+.afilter .frow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.afilter select,.afilter input{font:inherit;padding:10px 12px;border-radius:12px;border:1px solid var(--line);background:var(--surface);color:var(--ink);min-height:44px;max-width:100%}
+.afilter input{flex:1;min-width:200px}
+.afilter select{max-width:100%}
+.atable{width:100%;border-collapse:collapse;margin-top:14px;font-size:.94rem}
+.atable th{text-align:left;font-size:.7rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);padding:0 8px 8px 0;border-bottom:1px solid var(--line)}
+.atable td{padding:11px 8px 11px 0;border-bottom:1px solid var(--line);vertical-align:middle}
+.atable td:nth-child(2),.atable td:nth-child(3){font-family:var(--mono);white-space:nowrap}
+.atable b.good{color:var(--moss)} .atable b.mid{color:var(--accent)} .atable b.bad{color:var(--wine)}
+@media (max-width:620px){ .atable th:nth-child(2),.atable td:nth-child(2){display:none} }
 </style>
 
 <svg width="0" height="0" style="position:absolute" aria-hidden="true">
@@ -564,7 +577,10 @@ body.locked .page{visibility:hidden}
   <div class="wrap">
     <header class="bar">
       <div class="brand">SSLD TASSI<b>×</b>LD HERNÁDI</div>
-      <div class="qpill" id="qpill"></div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <button class="adminlink" id="adminOpen" title="Vezetői nézet">🔒 Vezetői</button>
+        <div class="qpill" id="qpill"></div>
+      </div>
     </header>
     <div class="hero">
       <div class="herotext">
@@ -779,8 +795,7 @@ body.locked .page{visibility:hidden}
 
   <footer>
     <div class="see">Ott<br>találkozunk<span>!</span></div>
-    <div class="meta"><span id="f-left"></span><span id="f-right"></span>
-      <button class="adminlink" id="adminOpen">Vezetői belépés</button></div>
+    <div class="meta"><span id="f-left"></span><span id="f-right"></span></div>
   </footer>
 </div>
 </div>
@@ -1245,18 +1260,20 @@ async function openAdmin(pass){
   box.innerHTML=`<div class="adminbar"><div class="in">
       <div><h2>Vezetői nézet</h2><span class="live">élő</span></div>
       <div style="display:flex;gap:8px;flex-wrap:wrap">
-        <button class="abtn" data-f="mind">Mind</button>
-        <button class="abtn" data-f="feedback">Értékelés</button>
-        <button class="abtn" data-f="idea">Visszajelzés</button>
-        <button class="abtn" data-f="photo">Fotó</button>
+        <button class="abtn" data-t="lista">Lista</button>
+        <button class="abtn" data-t="eloadas">Előadások</button>
         <button class="abtn" id="acsv">CSV</button>
         <button class="abtn" id="awheel">Kerék</button>
         <button class="abtn" id="aclose">Bezár</button>
       </div></div></div>
-    <div class="adminbody"><div class="astats" id="astats"></div><div id="alist"></div></div>`;
+    <div class="adminbody">
+      <div class="astats" id="astats"></div>
+      <div class="afilter" id="afilter"></div>
+      <div id="alist"></div>
+    </div>`;
   document.body.appendChild(box);
-  ADMIN={pass, filter:"mind", box};
-  box.querySelectorAll("[data-f]").forEach(b=>b.onclick=()=>{ ADMIN.filter=b.dataset.f; drawAdmin(); });
+  ADMIN={pass, filter:"mind", box, block:"", q:"", sort:"new", limit:50, tab:"lista"};
+  box.querySelectorAll("[data-t]").forEach(b=>b.onclick=()=>{ ADMIN.tab=b.dataset.t; ADMIN.limit=50; drawAdmin(); });
   box.querySelector("#aclose").onclick=()=>{ box.remove(); ADMIN=null; };
   box.querySelector("#acsv").onclick=()=>{
     const csv="idopont;nev;tipus;eloadas;pont;szoveg\n"+ENTRIES.map(e=>[new Date(e.created_at).toLocaleString("hu-HU"),e.name||"",e.kind,e.block_key||"",e.rating||"",(e.body||"").replace(/[\n;]/g," ")].join(";")).join("\n");
@@ -1273,8 +1290,8 @@ function peopleTable(){
 }
 function drawAdmin(){
   if(!ADMIN) return;
-  const {box, filter} = ADMIN;
-  box.querySelectorAll("[data-f]").forEach(b=>b.classList.toggle("on", b.dataset.f===filter));
+  const {box} = ADMIN;
+  box.querySelectorAll("[data-t]").forEach(b=>b.classList.toggle("on", b.dataset.t===ADMIN.tab));
   const fb=ENTRIES.filter(e=>e.kind==="feedback");
   const avg = a => a.length ? (a.reduce((s,e)=>s+(e.rating||0),0)/a.length).toFixed(1) : "-";
   const ppl = peopleTable();
@@ -1285,9 +1302,67 @@ function drawAdmin(){
     <div class="astat"><b>${ENTRIES.filter(e=>e.kind==="photo").length}</b><span>fotó</span></div>
     <div class="astat"><b>${ENTRIES.filter(e=>e.kind==="idea").length}</b><span>visszajelzés</span></div>
     <div class="astat"><b>${ppl.reduce((s,r)=>s+r.t,0)}</b><span>sorsjegy</span></div>`;
+
+  /* --- Előadások nézet --- */
+  if(ADMIN.tab==="eloadas"){
+    box.querySelector("#afilter").innerHTML="";
+    const byBlock={};
+    fb.forEach(e=>{ const k=e.block_key||"egyeb"; (byBlock[k]=byBlock[k]||[]).push(e); });
+    const rows=Object.entries(byBlock).map(([k,arr])=>({k, t:blockTitle(k), n:arr.length, a:+avg(arr)}))
+      .sort((x,y)=>y.a-x.a);
+    box.querySelector("#alist").innerHTML = rows.length ? `
+      <table class="atable"><thead><tr><th>Előadás</th><th>Db</th><th>Átlag</th><th></th></tr></thead><tbody>
+      ${rows.map(r=>`<tr><td>${esc(r.t)}</td><td>${r.n}</td>
+        <td><b class="${r.a>=8?"good":r.a>=6?"mid":"bad"}">${r.a.toFixed(1)}</b></td>
+        <td><button class="abtn" data-goblock="${esc(r.k)}">Megnéz</button></td></tr>`).join("")}
+      </tbody></table>` : `<p class="statusline">Még nincs értékelés.</p>`;
+    box.querySelectorAll("[data-goblock]").forEach(b=>b.onclick=()=>{
+      ADMIN.tab="lista"; ADMIN.filter="feedback"; ADMIN.block=b.dataset.goblock; ADMIN.limit=50; drawAdmin();
+      box.scrollTo({top:0,behavior:"smooth"}); });
+    return;
+  }
+
+  /* --- Lista nézet szűrőkkel --- */
+  const blocks=[...new Set(ENTRIES.filter(e=>e.block_key).map(e=>e.block_key))]
+    .map(k=>({k, t:blockTitle(k), n:ENTRIES.filter(e=>e.block_key===k).length}))
+    .sort((a,b)=>a.t.localeCompare(b.t,"hu"));
+  box.querySelector("#afilter").innerHTML = `
+    <div class="frow">
+      ${["mind","feedback","idea","photo"].map(k=>`<button class="abtn${ADMIN.filter===k?" on":""}" data-f="${k}">${({mind:"Mind",feedback:"Értékelés",idea:"Visszajelzés",photo:"Fotó"})[k]}</button>`).join("")}
+    </div>
+    <div class="frow">
+      <select id="fblock"><option value="">Minden előadás</option>
+        ${blocks.map(b=>`<option value="${esc(b.k)}"${ADMIN.block===b.k?" selected":""}>${esc(b.t)} (${b.n})</option>`).join("")}</select>
+      <select id="fsort">
+        <option value="new"${ADMIN.sort==="new"?" selected":""}>Legfrissebb elöl</option>
+        <option value="best"${ADMIN.sort==="best"?" selected":""}>Legjobb pont elöl</option>
+        <option value="worst"${ADMIN.sort==="worst"?" selected":""}>Legrosszabb pont elöl</option>
+        <option value="name"${ADMIN.sort==="name"?" selected":""}>Név szerint</option>
+      </select>
+      <input id="fq" placeholder="Keresés névre vagy szövegre" value="${esc(ADMIN.q)}">
+      ${(ADMIN.block||ADMIN.q||ADMIN.filter!=="mind")?`<button class="abtn" id="fclear">Szűrők törlése</button>`:""}
+    </div>`;
+  box.querySelectorAll("#afilter [data-f]").forEach(b=>b.onclick=()=>{ ADMIN.filter=b.dataset.f; ADMIN.limit=50; drawAdmin(); });
+  const bsel=box.querySelector("#fblock"); if(bsel) bsel.onchange=()=>{ ADMIN.block=bsel.value; ADMIN.limit=50; drawAdmin(); };
+  const ssel=box.querySelector("#fsort"); if(ssel) ssel.onchange=()=>{ ADMIN.sort=ssel.value; drawAdmin(); };
+  const qin=box.querySelector("#fq");
+  if(qin) qin.oninput=()=>{ ADMIN.q=qin.value; ADMIN.limit=50; clearTimeout(window.__aq);
+    window.__aq=setTimeout(()=>{ drawAdmin(); const f=box.querySelector("#fq"); if(f){ f.focus(); f.setSelectionRange(f.value.length,f.value.length);} },350); };
+  const cl=box.querySelector("#fclear"); if(cl) cl.onclick=()=>{ ADMIN.filter="mind"; ADMIN.block=""; ADMIN.q=""; ADMIN.limit=50; drawAdmin(); };
+
   const label={feedback:"értékelés",photo:"fotó",idea:"visszajelzés"};
-  const list=ENTRIES.filter(e=>filter==="mind"||e.kind===filter);
-  box.querySelector("#alist").innerHTML = list.map(e=>`
+  const q=ADMIN.q.trim().toLowerCase();
+  let list=ENTRIES.filter(e=>(ADMIN.filter==="mind"||e.kind===ADMIN.filter)
+    && (!ADMIN.block || e.block_key===ADMIN.block)
+    && (!q || (e.name||"").toLowerCase().includes(q) || (e.body||"").toLowerCase().includes(q)));
+  if(ADMIN.sort==="best") list=list.slice().sort((a,b)=>(b.rating||0)-(a.rating||0));
+  else if(ADMIN.sort==="worst") list=list.slice().sort((a,b)=>(a.rating||99)-(b.rating||99));
+  else if(ADMIN.sort==="name") list=list.slice().sort((a,b)=>(a.name||"").localeCompare(b.name||"","hu"));
+  const shown=list.slice(0, ADMIN.limit);
+  const fbSel=list.filter(e=>e.kind==="feedback");
+  box.querySelector("#alist").innerHTML =
+    `<p class="statusline"><b>${list.length}</b> találat${fbSel.length?` · átlag ${avg(fbSel)}`:""}${ADMIN.block?` · ${esc(blockTitle(ADMIN.block))}`:""}</p>` +
+    (shown.map(e=>`
     <div class="aitem${e.hidden?" hid":""}">
       <div class="m"><b>${esc(e.name||"?")}</b><span>${new Date(e.created_at).toLocaleString("hu-HU")}</span>
         <span class="pill">${label[e.kind]||e.kind}</span>
@@ -1299,7 +1374,9 @@ function drawAdmin(){
         <button class="abtn" data-h="${e.id}" data-v="${e.hidden?0:1}">${e.hidden?"Vissza":"Elrejt"}</button>
         <button class="abtn" data-del="${e.id}" data-path="${esc(e.photo_path||"")}" style="color:var(--wine);border-color:var(--wine)">Törlés</button>
       </div>
-    </div>`).join("") || `<p class="statusline">Még nincs beküldés ebben a nézetben.</p>`;
+    </div>`).join("") || `<p class="statusline">Nincs találat erre a szűrésre.</p>`) +
+    (list.length>shown.length ? `<button class="abtn" id="amore" style="margin-top:14px">További ${Math.min(50,list.length-shown.length)} megjelenítése</button>` : "");
+  const more=box.querySelector("#amore"); if(more) more.onclick=()=>{ ADMIN.limit+=50; drawAdmin(); };
   box.querySelectorAll("[data-h]").forEach(b=>b.onclick=async()=>{
     const { error }=await SB.rpc("moderate",{p_id:b.dataset.h,p_hidden:b.dataset.v==="1",p_pass:ADMIN.pass});
     if(error){ toast("Nem sikerült"); return; } await loadEntries(); drawAdmin(); });
