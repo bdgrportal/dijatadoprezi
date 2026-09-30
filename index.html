@@ -275,13 +275,13 @@ a.wavelink:hover .nm{text-decoration:underline}
 
 /* élő fotófolyam */
 .stream{position:relative;width:auto;margin-inline:calc(-1 * clamp(16px,4vw,48px));overflow:hidden;padding-block:6px;-webkit-mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent);mask-image:linear-gradient(90deg,transparent,#000 6%,#000 94%,transparent)}
-.stream .track{display:flex;gap:12px;width:max-content;animation:slide 60s linear infinite}
+.stream .track{display:flex;gap:12px;width:max-content;animation:slide 26s linear infinite;--reps:2}
 .stream:hover .track{animation-play-state:paused}
 .stream figure{margin:0;position:relative;width:min(46vw,260px);aspect-ratio:4/3;border-radius:16px;overflow:hidden;background:var(--surface-2);flex:none}
 .stream img{width:100%;height:100%;object-fit:cover;display:block}
 .stream figcaption{position:absolute;left:0;right:0;bottom:0;padding:8px 10px;font-size:.72rem;color:#fff;background:linear-gradient(transparent,rgba(0,0,0,.76))}
 .stream .empty{padding:26px 0;color:var(--muted);font-size:.92rem}
-@keyframes slide{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+@keyframes slide{from{transform:translateX(0)}to{transform:translateX(calc(-100% / var(--reps,2)))}}
 @media (prefers-reduced-motion:reduce){.stream .track{animation:none;overflow-x:auto}}
 
 /* vezetői belépés */
@@ -1219,8 +1219,10 @@ function paintStream(){
   el.style.animation="";
   const one = ph.map(p=>`<figure><img loading="lazy" src="${photoUrl(p.photo_path)}" alt="">
     <figcaption>${esc(p.body||"")}${p.body?" · ":""}${esc(p.name||"")}</figcaption></figure>`).join("");
-  el.innerHTML = one + one;
-  el.style.animationDuration = Math.max(28, ph.length*9) + "s";
+  const reps = Math.max(2, Math.ceil(12/ph.length));          // kevés képnél többször ismételjük, hogy ne legyen közel a másolat
+  el.innerHTML = one.repeat(reps);
+  el.style.setProperty("--reps", reps);
+  el.style.animationDuration = Math.max(14, Math.min(ph.length*reps*2.2, 70)) + "s";
 }
 function paintGallery(){
   paintStream();
@@ -1285,13 +1287,15 @@ async function shrink(file, max=1280, q=.66){
 function wireSocial(){
   const f=document.getElementById("ph"), send=document.getElementById("phsend"), st=document.getElementById("phst");
   if(f) f.onchange=()=>{ send.disabled=!f.files[0]; st.textContent=f.files[0]?f.files[0].name:""; };
+  let uploading=false;
   if(send) send.onclick=async()=>{
+    if(uploading) return;
     const file=f.files[0]; if(!file) return;
     if(!MYNAME){ const m=modal(`<div class="eyebrow">Fotófal</div><h3>Ki tölti fel?</h3>${nameField()}
       <button class="act" id="ok">Mehet</button><button class="act sec" id="c">Mégse</button>`);
       m.querySelector("#c").onclick=()=>m.remove();
       m.querySelector("#ok").onclick=()=>{ if(takeName(m)){ m.remove(); send.click(); } }; return; }
-    send.disabled=true; st.textContent="Kép tömörítése...";
+    uploading=true; send.disabled=true; st.textContent="Kép tömörítése...";
     try{
       const blob=await shrink(file);
       const path=`${Date.now()}-${Math.random().toString(36).slice(2,8)}.jpg`;
@@ -1300,8 +1304,8 @@ function wireSocial(){
       if(error) throw error;
       await saveEntry({kind:"photo", photo_path:path, body:document.getElementById("phcap").value.trim()||null});
       bump("photo");
-      st.textContent="Kész, felkerült a falra!"; f.value=""; document.getElementById("phcap").value="";
-    }catch(err){ console.error("FELTOLTES HIBA:", err); st.textContent="Nem sikerült: "+(err.message||"ismeretlen hiba"); send.disabled=false; }
+      st.textContent="Kész, felkerült a falra!"; f.value=""; document.getElementById("phcap").value=""; uploading=false;
+    }catch(err){ console.error("FELTOLTES HIBA:", err); st.textContent="Nem sikerült: "+(err.message||"ismeretlen hiba"); send.disabled=false; uploading=false; }
   };
   const fb=document.getElementById("fbsend");
   if(fb) fb.onclick=async()=>{
